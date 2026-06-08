@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import psycopg2
 
 app = Flask(__name__)
@@ -12,11 +12,8 @@ conn = psycopg2.connect(
 
 @app.route("/")
 def home():
-    return {
-        "success": True,
-        "message": "Village API Running"
-    }
-
+    return render_template("index.html")
+       
 @app.route("/states")
 def states():
 

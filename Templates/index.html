@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All India Village Explorer</title>
+
+    <style>
+
+        body{
+            background:#0f172a;
+            color:white;
+            font-family:Arial, sans-serif;
+            margin:0;
+            padding:40px;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .search-box{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        input{
+            width:300px;
+            padding:12px;
+            border:none;
+            border-radius:10px;
+            font-size:16px;
+        }
+
+        button{
+            padding:12px 20px;
+            border:none;
+            border-radius:10px;
+            cursor:pointer;
+            font-size:16px;
+            margin-left:10px;
+        }
+
+        .cards{
+            display:flex;
+            flex-wrap:wrap;
+            gap:20px;
+            justify-content:center;
+        }
+
+        .card{
+            background:#1e293b;
+            width:280px;
+            padding:20px;
+            border-radius:15px;
+            box-shadow:0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .card h3{
+            margin-top:0;
+        }
+
+        .stats{
+            display:flex;
+            justify-content:center;
+            gap:20px;
+            margin-bottom:40px;
+            flex-wrap:wrap;
+        }
+
+        .stat-card{
+            background:#1e293b;
+            padding:20px;
+            border-radius:15px;
+            width:150px;
+            text-align:center;
+        }
+
+        .number{
+            font-size:30px;
+            font-weight:bold;
+        }
+
+        select{
+            padding:10px;
+            border:none;
+            border-radius:8px;
+            font-size:16px;
+            margin-right:8px;
+        }
+
+        .cards{
+         display:flex;
+         flex-wrap:wrap;
+         gap:20px;
+         justify-content:center;
+         margin-top:30px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<h1>🌍 All India Village Explorer</h1>
+
+ <p style="text-align:center;color:#94a3b8;margin-top:-15px;margin-bottom:30px;">
+Explore villages, districts and subdistricts using Flask REST APIs and PostgreSQL
+</p>
+
+<div class="stats" id="stats"></div>
+
+<div class="search-box">
+
+    <input
+        type="text"
+        id="searchBox"
+        placeholder="Search village..."
+    >
+
+    <button onclick="searchVillage()">
+        Search
+    </button>
+
+</div>
+
+<div style="text-align:center; margin-bottom:30px;">
+
+    <select id="stateSelect" onchange="loadDistricts()">
+        <option>Select State</option>
+    </select>
+
+    <select id="districtSelect" onchange="loadSubdistricts()">
+        <option>Select District</option>
+    </select>
+
+    <select id="subdistrictSelect">
+        <option>Select Subdistrict</option>
+    </select>
+
+    <button onclick="loadHierarchyVillages()">
+        Load Villages
+    </button>
+
+</div>
+
+<div class="cards" id="result"></div>
+
+<div style="
+text-align:center;
+margin-top:50px;
+color:#94a3b8;
+">
+Built with Flask, PostgreSQL and REST APIs
+</div>
+
+<script>
+
+async function loadStates(){
+
+    let response = await fetch("/states");
+
+    let states = await response.json();
+
+    let html = '<option value="">Select State</option>';
+
+    for(let state of states){
+
+        html += `
+            <option value="${state.id}">
+                ${state.state_name}
+            </option>
+        `;
+    }
+
+    document.getElementById("stateSelect")
+        .innerHTML = html;
+}
+
+async function loadDistricts(){
+
+    let stateId =
+        document.getElementById("stateSelect").value;
+
+    if(!stateId) return;
+
+    let response =
+        await fetch("/districts/" + stateId);
+
+    let districts =
+        await response.json();
+
+    let html =
+        '<option value="">Select District</option>';
+
+    for(let district of districts){
+
+        html += `
+            <option value="${district.id}">
+                ${district.district_name}
+            </option>
+        `;
+    }
+
+    document.getElementById("districtSelect")
+        .innerHTML = html;
+}
+
+async function loadSubdistricts(){
+
+    let districtId =
+        document.getElementById("districtSelect").value;
+
+    if(!districtId) return;
+
+    let response =
+        await fetch("/subdistricts/" + districtId);
+
+    let subdistricts =
+        await response.json();
+
+    let html =
+        '<option value="">Select Subdistrict</option>';
+
+    for(let sub of subdistricts){
+
+        html += `
+            <option value="${sub.id}">
+                ${sub.subdistrict_name}
+            </option>
+        `;
+    }
+
+    document.getElementById("subdistrictSelect")
+        .innerHTML = html;
+}
+
+async function loadStats(){
+    
+    let response =
+        await fetch("/analytics");
+
+    let data =
+        await response.json();
+
+    document.getElementById("stats").innerHTML = `
+        <div class="stat-card">
+            <div class="number">${data.summary.states}</div>
+            States
+        </div>
+
+        <div class="stat-card">
+            <div class="number">${data.summary.districts}</div>
+            Districts
+        </div>
+
+        <div class="stat-card">
+            <div class="number">${data.summary.subdistricts}</div>
+            Subdistricts
+        </div>
+
+        <div class="stat-card">
+            <div class="number">${data.summary.villages}</div>
+            Villages
+        </div>
+    `;
+}
+
+async function searchVillage(){
+
+    let q =
+        document.getElementById("searchBox").value;
+
+    let response =
+        await fetch("/search?q=" + q);
+
+    let data =
+        await response.json();
+
+    let html = "";
+
+    for(let village of data){
+
+        html += `
+            <div class="card">
+
+                <h3>
+                    ${village.village_name}
+                </h3>
+
+                <p>
+                    Village Code:
+                    ${village.village_code}
+                </p>
+
+                <p>
+                    Subdistrict:
+                    ${village.subdistrict_id}
+                </p>
+
+            </div>
+        `;
+    }
+
+    document.getElementById("result")
+        .innerHTML = html;
+}
+
+async function loadHierarchyVillages(){
+
+    let subdistrictId =
+        document.getElementById("subdistrictSelect").value;
+
+    if(!subdistrictId) return;
+
+    let response =
+        await fetch(
+            "/villages-by-subdistrict/" +
+            subdistrictId
+        );
+
+    let data =
+        await response.json();
+
+    let html = "";
+
+    for(let village of data){
+
+        html += `
+            <div class="card">
+
+                <h3>
+                    ${village.village_name}
+                </h3>
+
+                <p>
+                    Village Code:
+                    ${village.village_code}
+                </p>
+
+            </div>
+        `;
+    }
+
+    document.getElementById("result")
+        .innerHTML = html;
+}
+
+loadStats();
+loadStates();
+</script>
+
+</body>
+</html>
