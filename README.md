@@ -1,75 +1,66 @@
-# All India Village API
+# All India Village Explorer
 
-A REST API built using Flask and PostgreSQL to provide hierarchical Indian geographical data.
+## Overview
+
+A Flask + PostgreSQL based geographical data platform providing hierarchical access to Indian village data.
+
+The platform allows users to navigate:
+
+State → District → Subdistrict → Village
+
+and perform village-level searches through REST APIs.
+
+---
 
 ## Features
 
-* State API
-* District API
-* Subdistrict API
-* Village API
-* Search API
-* PostgreSQL Integration
-* Hierarchical Data Structure
+* State, District and Subdistrict hierarchy
+* Village search functionality
+* Village details API
+* PostgreSQL relational database
+* API key management
+* API usage logging
+* Dashboard analytics
+* Dynamic frontend using HTML, CSS and JavaScript
+
+---
 
 ## Tech Stack
 
-* Python
 * Flask
 * PostgreSQL
-* Pandas
-* psycopg2
+* HTML
+* CSS
+* JavaScript
+* REST APIs
 
-## Dataset
+---
 
-Government MDDS Village Dataset
+## Database Statistics
 
-## Implemented APIs
+* States: 2
+* Districts: 17
+* Subdistricts: 127
+* Villages: 21,148+
 
-### Health Check
+---
 
-GET /health
+## API Endpoints
 
-### States
+* /states
+* /districts/<state_id>
+* /subdistricts/<district_id>
+* /villages-by-subdistrict/<subdistrict_id>
+* /search?q=village_name
+* /village/<village_id>
+* /dashboard
 
-GET /states
+---
 
-### Districts
+## Future Scope
 
-GET /districts
-
-### Subdistricts
-
-GET /subdistricts
-
-### Villages
-
-GET /villages
-
-### Search Villages
-
-GET /search?q=ari
-
-## Database Structure
-
-Country
-→ State
-→ District
-→ Subdistrict
-→ Village
-
-## Current Progress
-
-* Sikkim dataset imported
-* 452 villages imported
-* Search functionality implemented
-* REST APIs operational
-
-## Future Improvements
-
-* Full India dataset import
-* Authentication & API Keys
-* Rate Limiting
-* Redis Caching
-* React Dashboard
-* Analytics Panel
+* Complete India dataset
+* Authentication and subscription plans
+* Rate limiting
+* Deployment on cloud
+* API monetization
